@@ -13,18 +13,9 @@ export const setExtensionPath = (ePath: string) => {
 
 export async function createParser(): Promise<Parser> {
   try {
-    const baseDir = EXTENSION_PATH || path.join(__dirname, '..');
-
-    const runtimeWasmPath = path.resolve(baseDir, 'dist', 'tree-sitter.wasm');
-    const cppWasmPath = path.resolve(baseDir, 'dist', 'tree-sitter-cpp.wasm');
-
-    console.log('Runtime WASM Path:', runtimeWasmPath);
-    console.log('CPP WASM Path:', cppWasmPath);
-
     await Parser.init({
       locateFile(scriptName: string) {
         const wasmPath = path.join(EXTENSION_PATH, 'dist', scriptName);
-        console.log('Loading WASM from:', wasmPath);
         return wasmPath;
       },
     });
@@ -62,7 +53,5 @@ export const parseCode = (parser: Parser, code: string) => {
 export const logTree = (node: SyntaxNode) => {
   // eslint-disable-next-line no-console
   console.log(node.type, node.text);
-  for (const child of node.children) {
-    logTree(child);
-  }
+  node.children?.forEach(logTree);
 };

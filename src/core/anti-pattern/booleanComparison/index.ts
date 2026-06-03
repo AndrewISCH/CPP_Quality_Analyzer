@@ -9,16 +9,9 @@ import { getRuleFromDefaultConfig } from '../../rules-builder/default_config';
 export interface BooleanComparisonConfigType {}
 
 const BOOLEAN_LITERALS = new Set(['true', 'false']);
-const NUMERIC_BOOLEAN_LITERALS = new Set(['0', '1']);
 
 const isBooleanLiteral = (node: Node): boolean => {
   if (BOOLEAN_LITERALS.has(node.type)) {
-    return true;
-  }
-  if (
-    node.type === 'number_literal' &&
-    NUMERIC_BOOLEAN_LITERALS.has(node.text)
-  ) {
     return true;
   }
   return false;

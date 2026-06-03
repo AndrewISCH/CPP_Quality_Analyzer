@@ -19,6 +19,8 @@ import { parameterReassignmentBuilder } from '../anti-pattern/parameterReassignm
 import { nestedTernaryBuilder } from '../anti-pattern/nestedTernary';
 import { redundantBooleanReturnBuilder } from '../anti-pattern/redundantBooleanReturn';
 import { namingConventionBuilder } from '../anti-pattern/namingConvention';
+import { redundantBooleanTernaryBuilder } from '../anti-pattern/redundantBooleanTernary';
+import { duplicateConditionBuilder } from '../anti-pattern/duplicateCondition';
 
 const NODE_TYPE_TO_APPLIED_RULES: Record<string, AntiPatternIdentifier[]> = {
   ['declaration']: [
@@ -37,6 +39,7 @@ const NODE_TYPE_TO_APPLIED_RULES: Record<string, AntiPatternIdentifier[]> = {
   ['if_statement']: [
     AntiPatternIdentifier.DEEP_NESTING,
     AntiPatternIdentifier.REDUNDANT_BOOLEAN_RETURN,
+    AntiPatternIdentifier.DUPLICATE_CONDITION,
   ],
   ['for_statement']: [AntiPatternIdentifier.DEEP_NESTING],
   ['while_statement']: [AntiPatternIdentifier.DEEP_NESTING],
@@ -50,7 +53,10 @@ const NODE_TYPE_TO_APPLIED_RULES: Record<string, AntiPatternIdentifier[]> = {
   ['parameter_list']: [AntiPatternIdentifier.TOO_MANY_PARAMS],
   ['assignment_expression']: [AntiPatternIdentifier.PARAM_REASSIGNMENT],
   ['update_expression']: [AntiPatternIdentifier.PARAM_REASSIGNMENT],
-  ['conditional_expression']: [AntiPatternIdentifier.NESTED_TERNARY],
+  ['conditional_expression']: [
+    AntiPatternIdentifier.NESTED_TERNARY,
+    AntiPatternIdentifier.REDUNDANT_BOOLEAN_TERNARY,
+  ],
 };
 
 const RULE_BUILDERS: {
@@ -68,8 +74,11 @@ const RULE_BUILDERS: {
   [AntiPatternIdentifier.PARAM_REASSIGNMENT]: parameterReassignmentBuilder,
   [AntiPatternIdentifier.NAMING_CONVENTION]: namingConventionBuilder,
   [AntiPatternIdentifier.NESTED_TERNARY]: nestedTernaryBuilder,
+  [AntiPatternIdentifier.DUPLICATE_CONDITION]: duplicateConditionBuilder,
   [AntiPatternIdentifier.REDUNDANT_BOOLEAN_RETURN]:
     redundantBooleanReturnBuilder,
+  [AntiPatternIdentifier.REDUNDANT_BOOLEAN_TERNARY]:
+    redundantBooleanTernaryBuilder,
 };
 
 type OtherOptionsProperties = {
@@ -126,7 +135,6 @@ class RulesConfig {
     try {
       const raw = fs.readFileSync(configPath, 'utf-8');
       const userConfig = JSON.parse(raw);
-      // console.log(deepMerge(DEFAULT_CONFIG, userConfig));
       return deepMerge(DEFAULT_CONFIG, userConfig);
     } catch {
       return DEFAULT_CONFIG;

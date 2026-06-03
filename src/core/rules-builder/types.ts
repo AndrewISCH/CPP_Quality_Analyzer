@@ -13,6 +13,8 @@ import { TooManyParametersConfigType } from '../anti-pattern/tooManyParams';
 import { ParameterReassignmentConfigType } from '../anti-pattern/parameterReassignment';
 import { RedundantBooleanReturnConfigType } from '../anti-pattern/redundantBooleanReturn';
 import { NamingConventionConfigType } from '../anti-pattern/namingConvention';
+import { RedundantBooleanTernaryConfigType } from '../anti-pattern/redundantBooleanTernary';
+import { DuplicateConditionConfigType } from '../anti-pattern/duplicateCondition';
 
 export type DiagnosticLevel = 'error' | 'warn' | 'info';
 
@@ -33,7 +35,9 @@ interface AntiPatternExtendedConfiguration {
   [AntiPatternIdentifier.TOO_MANY_PARAMS]: TooManyParametersConfigType;
   [AntiPatternIdentifier.PARAM_REASSIGNMENT]: ParameterReassignmentConfigType;
   [AntiPatternIdentifier.NESTED_TERNARY]: DeepNestingConfigType;
+  [AntiPatternIdentifier.DUPLICATE_CONDITION]: DuplicateConditionConfigType;
   [AntiPatternIdentifier.REDUNDANT_BOOLEAN_RETURN]: RedundantBooleanReturnConfigType;
+  [AntiPatternIdentifier.REDUNDANT_BOOLEAN_TERNARY]: RedundantBooleanTernaryConfigType;
   [AntiPatternIdentifier.NAMING_CONVENTION]: NamingConventionConfigType;
 }
 

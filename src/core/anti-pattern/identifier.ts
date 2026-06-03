@@ -12,4 +12,6 @@ export enum AntiPatternIdentifier {
   NESTED_TERNARY = 'nestedTernary',
   REDUNDANT_BOOLEAN_RETURN = 'redundantBooleanReturn',
   NAMING_CONVENTION = 'namingConvention',
+  REDUNDANT_BOOLEAN_TERNARY = 'redundantBooleanTernary',
+  DUPLICATE_CONDITION = 'duplicateCondition',
 }

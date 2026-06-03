@@ -15,7 +15,9 @@ export const DEFAULT_CONFIG: AnalyzerConfig = {
     tooManyParams: { enabled: true, level: 'warn', maxParams: 5 },
     paramReassignment: { enabled: true, level: 'error' },
     nestedTernary: { enabled: true, maxDepth: 2, level: 'error' },
+    duplicateCondition: { enabled: true, level: 'error' },
     redundantBooleanReturn: { enabled: true, level: 'error' },
+    redundantBooleanTernary: { enabled: true, level: 'error' },
     namingConvention: { enabled: false, level: 'warn', style: 'google' },
   },
 } as const;
