@@ -2,7 +2,6 @@ import { AnalyzerConfig, BuiltRule, RuleBuilder } from './types';
 import { DEFAULT_CONFIG } from './default_config';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
-import * as path from 'path';
 import { CONFIG_FILENAME } from '../../constants/constants';
 import { AntiPatternIdentifier } from '../anti-pattern/identifier';
 import { longFunctionBuilder } from '../anti-pattern/longFunction';
@@ -88,6 +87,7 @@ type OtherOptionsProperties = {
 class RulesConfig {
   private rules: Record<string, BuiltRule[]> = {};
   private options: Partial<OtherOptionsProperties> = {};
+  private configFilePath: string | null = null;
 
   constructor() {
     this.build();
@@ -99,6 +99,15 @@ class RulesConfig {
 
   public getOptions(): Partial<OtherOptionsProperties> {
     return this.options;
+  }
+
+  public async findConfigFile(): Promise<void> {
+    const files = await vscode.workspace.findFiles(
+      `**/${CONFIG_FILENAME}`,
+      '**/node_modules/**',
+      1
+    );
+    this.configFilePath = files[0]?.fsPath ?? null;
   }
 
   public build(): void {
@@ -118,22 +127,12 @@ class RulesConfig {
   }
 
   private loadConfig(): AnalyzerConfig {
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (!workspaceFolders) {
-      return DEFAULT_CONFIG;
-    }
-
-    const configPath = path.join(
-      workspaceFolders[0].uri.fsPath,
-      CONFIG_FILENAME
-    );
-
-    if (!fs.existsSync(configPath)) {
+    if (!this.configFilePath || !fs.existsSync(this.configFilePath)) {
       return DEFAULT_CONFIG;
     }
 
     try {
-      const raw = fs.readFileSync(configPath, 'utf-8');
+      const raw = fs.readFileSync(this.configFilePath, 'utf-8');
       const userConfig = JSON.parse(raw);
       return deepMerge(DEFAULT_CONFIG, userConfig);
     } catch {

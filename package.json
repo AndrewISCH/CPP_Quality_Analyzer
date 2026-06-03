@@ -1,14 +1,30 @@
 {
   "name": "cpp-quality-analyzer",
   "displayName": "CPP Quality Analyzer",
-  "description": "Code analyzer that detects code smells and anti-patterns for C++",
+  "description": "Static code analyzer for detecting code smells and anti-patterns in C++ code",
   "version": "0.0.1",
+  "publisher": "AndrewISCH",
+  "license": "MIT",
+  "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.120.0"
   },
   "categories": [
-    "Other"
+    "Linters",
+    "Programming Languages"
   ],
+  "keywords": [
+    "c++",
+    "cpp",
+    "linter",
+    "static analysis",
+    "code quality",
+    "code smells"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AndrewISCH/CPP_Quality_Analyzer"
+  },
   "activationEvents": [
     "*"
   ],
@@ -37,6 +53,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/emscripten": "^1.41.5",
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.9.1",
     "@types/vscode": "^1.120.0",

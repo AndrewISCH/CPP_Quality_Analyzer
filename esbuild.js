@@ -12,7 +12,6 @@ const WASM_CPP_GRAMMAR_PATH =
 
 const WASM_WEB_ENGINE_DIST_PATH = 'dist/web-tree-sitter.wasm';
 const WASM_CPP_GRAMMAR_DIST_PATH = 'dist/tree-sitter-cpp.wasm';
-// const WASM_GRAMMAR_DIST_PATH = 'dist/tree-sitter.wasm';
 
 const copyWasmFiles = () => {
   if (!fs.existsSync(path.join(__dirname, 'dist'))) {
@@ -23,15 +22,12 @@ const copyWasmFiles = () => {
     path.join(__dirname, WASM_WEB_ENGINE_PATH),
     path.join(__dirname, WASM_WEB_ENGINE_DIST_PATH)
   );
-  // fs.copyFileSync(
-  //   path.join(__dirname, WASM_WEB_GRAMMAR_PATH),
-  //   path.join(__dirname, WASM_GRAMMAR_DIST_PATH)
-  // );
   fs.copyFileSync(
     path.join(__dirname, WASM_CPP_GRAMMAR_PATH),
     path.join(__dirname, WASM_CPP_GRAMMAR_DIST_PATH)
   );
 };
+
 const esbuildProblemMatcherPlugin = {
   name: 'esbuild-problem-matcher',
   setup(build) {
@@ -40,7 +36,7 @@ const esbuildProblemMatcherPlugin = {
     });
     build.onEnd((result) => {
       result.errors.forEach(({ text, location }) => {
-        console.error(`✘ [ERROR] ${text}`);
+        console.error(`[ERROR] ${text}`);
         console.error(
           `    ${location.file}:${location.line}:${location.column}:`
         );
@@ -61,12 +57,15 @@ async function main() {
     sourcesContent: false,
     platform: 'node',
     outfile: 'dist/extension.js',
-    external: ['vscode', 'web-tree-sitter'],
+    external: ['vscode'],
     logLevel: 'silent',
-    plugins: [
-      /* add to the end of plugins array */
-      esbuildProblemMatcherPlugin,
-    ],
+    banner: {
+      js: `const __importMetaUrl = require('url').pathToFileURL(__filename).href;`,
+    },
+    define: {
+      'import.meta.url': '__importMetaUrl',
+    },
+    plugins: [esbuildProblemMatcherPlugin],
   });
   if (watch) {
     await ctx.watch();

@@ -4,7 +4,7 @@ import { AnalyzerConfig } from './rules_builder';
 export const DEFAULT_CONFIG: AnalyzerConfig = {
   autoChange: true,
   rules: {
-    longFunction: { enabled: true, maxLines: 20, level: 'warn' },
+    longFunction: { enabled: true, maxLines: 50, level: 'warn' },
     magicNumbers: { enabled: true, level: 'warn' },
     deepNesting: { enabled: true, maxDepth: 3, level: 'error' },
     nestedTry: { enabled: true, level: 'error' },

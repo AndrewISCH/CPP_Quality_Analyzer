@@ -1,5 +1,5 @@
 import { rulesConfig } from '../rules-builder/rules_builder';
-import { getParser, logTree, parseCode, SyntaxNode } from './syntax-parser';
+import { getParser, parseCode, SyntaxNode } from './syntax-parser';
 import * as vscode from 'vscode';
 
 export const analyzeDocument = async (
@@ -9,7 +9,6 @@ export const analyzeDocument = async (
   const parser = await getParser();
   const code = doc.getText();
   const parsedTree = parseCode(parser, code);
-  parsedTree && logTree(parsedTree);
   const diagnostics = parsedTree ? analyzeSyntaxTree(parsedTree) : [];
   diagnosticCollection.set(doc.uri, diagnostics);
 };

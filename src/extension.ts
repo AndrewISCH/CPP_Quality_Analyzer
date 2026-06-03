@@ -20,6 +20,8 @@ const analyzeAllOpenedDocs = (
 export async function activate(context: vscode.ExtensionContext) {
   setExtensionPath(context.extensionPath);
 
+  await rulesConfig.findConfigFile();
+
   rulesConfig.build();
 
   await createParser();
@@ -67,7 +69,8 @@ export async function activate(context: vscode.ExtensionContext) {
     CONFIG_FILENAME_MATCHER
   );
 
-  watcher.onDidChange(() => {
+  watcher.onDidChange(async () => {
+    await rulesConfig.findConfigFile();
     rulesConfig.build();
     analyzeAllOpenedDocs(diagnosticCollection);
   });
@@ -75,7 +78,7 @@ export async function activate(context: vscode.ExtensionContext) {
     rulesConfig.build();
     analyzeAllOpenedDocs(diagnosticCollection);
   });
-  watcher.onDidDelete(() => {
+  watcher.onDidDelete(async () => {
     rulesConfig.build();
     analyzeAllOpenedDocs(diagnosticCollection);
   });
