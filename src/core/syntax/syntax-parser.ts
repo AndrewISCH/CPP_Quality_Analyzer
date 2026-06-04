@@ -1,5 +1,6 @@
 import path from 'path';
-import { Parser, Language, Node } from 'web-tree-sitter';
+import { Parser, Language, Node, Tree, Edit } from 'web-tree-sitter';
+import * as vscode from 'vscode';
 
 let instance: Parser | null = null;
 let initPromise: Promise<Parser> | null = null;
@@ -48,6 +49,37 @@ export async function getParser(): Promise<Parser> {
 export const parseCode = (parser: Parser, code: string) => {
   const tree = parser.parse(code);
   return tree?.rootNode;
+};
+
+export const parseCodeIncremental = (
+  parser: Parser,
+  code: string,
+  oldTree: Tree,
+  changes: readonly vscode.TextDocumentContentChangeEvent[]
+) => {
+  changes.forEach((change) => {
+    const editInstance = new Edit({
+      startIndex: change.rangeOffset,
+      oldEndIndex: change.rangeOffset + change.rangeLength,
+      newEndIndex: change.rangeOffset + change.text.length,
+      startPosition: {
+        row: change.range.start.line,
+        column: change.range.start.character,
+      },
+      oldEndPosition: {
+        row: change.range.end.line,
+        column: change.range.end.character,
+      },
+      newEndPosition: {
+        row: change.range.end.line,
+        column: change.range.start.character + change.text.length,
+      },
+    });
+    oldTree.edit(editInstance);
+  });
+
+  const newTree = parser.parse(code, oldTree);
+  return newTree?.rootNode;
 };
 
 export const logTree = (node: SyntaxNode) => {

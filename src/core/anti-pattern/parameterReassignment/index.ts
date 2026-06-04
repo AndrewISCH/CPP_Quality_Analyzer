@@ -110,10 +110,10 @@ export const parameterReassignmentBuilder: RuleBuilder<
 
   return {
     check(node: Node) {
-      const getTargetIdentifier =
+      const targetIdentifierSelector =
         IDENTIFIER_SELECTORS[node.type as VariableModificationNodeType];
 
-      const targetId = getTargetIdentifier(node);
+      const targetId = targetIdentifierSelector(node);
       if (!targetId) {
         return null;
       }

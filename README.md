@@ -38,23 +38,23 @@ A Visual Studio Code extension that performs static analysis of C++ code to dete
 
 ## Configuration
 
-Create a `.cppanalyzer.json` file in your project root:
+Create a `.cppquality.json` file in your project root:
 
-\`\`\`json
+```json
 {
-"rules": {
-"longFunction": {
-"enabled": true,
-"level": "warning",
-"maxLines": 30
-},
-"namingConvention": {
-"enabled": true,
-"style": "google"
+  "rules": {
+    "longFunction": {
+      "enabled": true,
+      "level": "warning",
+      "maxLines": 30
+    },
+    "namingConvention": {
+      "enabled": true,
+      "style": "google"
+    }
+  }
 }
-}
-}
-\`\`\`
+```
 
 ## Requirements
 
