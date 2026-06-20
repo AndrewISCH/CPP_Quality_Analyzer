@@ -48,7 +48,7 @@ export async function getParser(): Promise<Parser> {
 
 export const parseCode = (parser: Parser, code: string) => {
   const tree = parser.parse(code);
-  return tree?.rootNode;
+  return tree;
 };
 
 export const parseCodeIncremental = (
@@ -79,7 +79,7 @@ export const parseCodeIncremental = (
   });
 
   const newTree = parser.parse(code, oldTree);
-  return newTree?.rootNode;
+  return newTree;
 };
 
 export const logTree = (node: SyntaxNode) => {
