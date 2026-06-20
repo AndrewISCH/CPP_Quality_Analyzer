@@ -42,7 +42,8 @@ interface AntiPatternExtendedConfiguration {
 }
 
 export interface AnalyzerConfig {
-  autoChange: boolean;
+  fixOnSave: boolean;
+  ignore?: string[];
   rules: {
     [K in AntiPatternIdentifier]: (K extends keyof AntiPatternExtendedConfiguration
       ? AntiPatternExtendedConfiguration[K]

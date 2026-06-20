@@ -2,7 +2,7 @@ import { AntiPatternIdentifier } from '../anti-pattern/identifier';
 import { AnalyzerConfig } from './rules_builder';
 
 export const DEFAULT_CONFIG: AnalyzerConfig = {
-  autoChange: true,
+  fixOnSave: true,
   rules: {
     longFunction: { enabled: true, maxLines: 50, level: 'warn' },
     magicNumbers: { enabled: true, level: 'warn' },

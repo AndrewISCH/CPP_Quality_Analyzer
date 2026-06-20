@@ -12,17 +12,44 @@ import {
   analyzeDocumentIncrementally,
   deleteTree,
 } from './core/syntax/analyzer';
+import {
+  clearDiagnosticForIgnoredDocs,
+  shouldIgnore,
+} from './core/rules-builder/ignore';
 
 const CONFIG_FILENAME_MATCHER = `**/${CONFIG_FILENAME}`;
+
+const isDocValid = (doc: vscode.TextDocument) => {
+  const ignoredPatterns = rulesConfig.getOptions().ignore;
+
+  return (
+    SUPPORTED_LANGUAGE_IDS.includes(doc.languageId) &&
+    (!ignoredPatterns || !shouldIgnore(doc.uri, ignoredPatterns))
+  );
+};
+
+const PENDING_CHANGES = new Map<
+  string,
+  {
+    document: vscode.TextDocument;
+    changes: vscode.TextDocumentContentChangeEvent[];
+  }
+>();
 
 const analyzeAllOpenedDocs = (
   diagnosticCollection: vscode.DiagnosticCollection
 ) => {
-  const openedDocs = vscode.workspace.textDocuments.filter((doc) =>
-    SUPPORTED_LANGUAGE_IDS.includes(doc.languageId)
-  );
+  const openedDocs = vscode.workspace.textDocuments.filter(isDocValid);
 
   openedDocs.forEach(async (doc) => analyzeDocument(doc, diagnosticCollection));
+};
+
+const rebuildConfig = (diagnosticCollection: vscode.DiagnosticCollection) => {
+  rulesConfig.build();
+  const ignoredPatterns = rulesConfig.getOptions().ignore;
+  ignoredPatterns &&
+    clearDiagnosticForIgnoredDocs(diagnosticCollection, ignoredPatterns);
+  analyzeAllOpenedDocs(diagnosticCollection);
 };
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -43,7 +70,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   vscode.workspace.onDidOpenTextDocument(
     async (doc) => {
-      if (SUPPORTED_LANGUAGE_IDS.includes(doc.languageId)) {
+      if (isDocValid(doc)) {
         await analyzeDocument(doc, diagnosticCollection);
       }
     },
@@ -51,9 +78,45 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions
   );
 
+  const processChanges = debouncer(async () => {
+    const values = Array.from(PENDING_CHANGES.values());
+    PENDING_CHANGES.clear();
+
+    values.forEach(async ({ document, changes }) => {
+      await analyzeDocumentIncrementally(
+        document,
+        changes,
+        diagnosticCollection
+      );
+    });
+  });
+
+  vscode.workspace.onDidChangeTextDocument(
+    (event) => {
+      if (!isDocValid(event.document)) {
+        return;
+      }
+      const uriKey = event.document.uri.toString();
+      const existing = PENDING_CHANGES.get(uriKey);
+
+      if (existing) {
+        existing.changes.push(...event.contentChanges);
+      } else {
+        PENDING_CHANGES.set(uriKey, {
+          document: event.document,
+          changes: [...event.contentChanges],
+        });
+      }
+
+      processChanges();
+    },
+    null,
+    context.subscriptions
+  );
+
   // vscode.workspace.onDidSaveTextDocument(
   //   async (doc) => {
-  //     if (SUPPORTED_LANGUAGE_IDS.includes(doc.languageId)) {
+  //     if (isDocValid(doc)) {
   //       // console.log('applying, blablabla');
   //       // const edit = new vscode.WorkspaceEdit();
   //       // edit.insert(
@@ -84,42 +147,19 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions
   );
 
-  const analyzeDocumentOnChange = debouncer(
-    async (event: vscode.TextDocumentChangeEvent) => {
-      await analyzeDocumentIncrementally(
-        event.document,
-        event.contentChanges,
-        diagnosticCollection
-      );
-    }
-  );
-
-  vscode.workspace.onDidChangeTextDocument(
-    (event) => {
-      if (SUPPORTED_LANGUAGE_IDS.includes(event.document.languageId)) {
-        analyzeDocumentOnChange(event);
-      }
-    },
-    null,
-    context.subscriptions
-  );
-
   const watcher = vscode.workspace.createFileSystemWatcher(
     CONFIG_FILENAME_MATCHER
   );
 
   watcher.onDidChange(async () => {
     await rulesConfig.findConfigFile();
-    rulesConfig.build();
-    analyzeAllOpenedDocs(diagnosticCollection);
+    rebuildConfig(diagnosticCollection);
   });
-  watcher.onDidCreate(() => {
-    rulesConfig.build();
-    analyzeAllOpenedDocs(diagnosticCollection);
+  watcher.onDidCreate(async () => {
+    rebuildConfig(diagnosticCollection);
   });
   watcher.onDidDelete(async () => {
-    rulesConfig.build();
-    analyzeAllOpenedDocs(diagnosticCollection);
+    rebuildConfig(diagnosticCollection);
   });
 
   context.subscriptions.push(watcher);
