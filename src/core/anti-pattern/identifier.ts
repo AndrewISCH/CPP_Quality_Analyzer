@@ -1,3 +1,5 @@
+import { isString } from '../../utility/type-guards';
+
 export enum AntiPatternIdentifier {
   LONG_FUNCTION_PATTERN = 'longFunction',
   DEEP_NESTING = 'deepNesting',
@@ -15,3 +17,9 @@ export enum AntiPatternIdentifier {
   REDUNDANT_BOOLEAN_TERNARY = 'redundantBooleanTernary',
   DUPLICATE_CONDITION = 'duplicateCondition',
 }
+
+export const isAntipatternIdentifier = (
+  arg: unknown
+): arg is AntiPatternIdentifier =>
+  isString(arg) &&
+  Object.values(AntiPatternIdentifier).includes(arg as AntiPatternIdentifier);

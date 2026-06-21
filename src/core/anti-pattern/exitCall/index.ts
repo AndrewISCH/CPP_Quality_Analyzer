@@ -1,10 +1,10 @@
 import { Node } from 'web-tree-sitter';
-import * as vscode from 'vscode';
 import { RuleBuilder, BaseRuleConfig } from '../../rules-builder/types';
 import { nodeToRange } from '../../../utility/nodeToRange';
 import { AntiPatternIdentifier } from '../identifier';
 import { SEVERITY_LEVEL_MAPPING } from '../../../constants/constants';
-import { getRuleFromDefaultConfig } from '../../rules-builder/default_config';
+import { getRuleFromDefaultConfig } from '../../rules-builder/config';
+import { createDiagnostic } from '../common';
 
 export interface ExitCallConfigType {}
 
@@ -29,10 +29,11 @@ export const exitCallBuilder: RuleBuilder<
         return null;
       }
 
-      return new vscode.Diagnostic(
+      return createDiagnostic(
         nodeToRange(node),
         `Avoid using '${functionNode.text}' for program termination`,
-        SEVERITY_LEVEL_MAPPING[severityLevel]
+        SEVERITY_LEVEL_MAPPING[severityLevel],
+        AntiPatternIdentifier.EMPTY_CATCH_BLOCK
       );
     },
   };

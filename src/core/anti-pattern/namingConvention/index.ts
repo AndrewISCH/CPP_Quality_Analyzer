@@ -1,16 +1,16 @@
 import { Node } from 'web-tree-sitter';
-import * as vscode from 'vscode';
 import { RuleBuilder, BaseRuleConfig } from '../../rules-builder/types';
 import { nodeToRange } from '../../../utility/nodeToRange';
 import { AntiPatternIdentifier } from '../identifier';
 import { SEVERITY_LEVEL_MAPPING } from '../../../constants/constants';
-import { getRuleFromDefaultConfig } from '../../rules-builder/default_config';
+import { getRuleFromDefaultConfig } from '../../rules-builder/config';
 import {
   NAMING_CONVENTIONS,
   NODE_TYPE_TO_READABLE_NAME,
   NamingStyle,
   DeclarationNodeType,
 } from './patterns';
+import { createDiagnostic } from '../common';
 
 export interface NamingConventionConfigType {
   style: NamingStyle;
@@ -122,10 +122,11 @@ export const namingConventionBuilder: RuleBuilder<
           ? `(${patterns.map((pattern) => pattern.name).join(', ')})`
           : patterns[0].name;
 
-      return new vscode.Diagnostic(
+      return createDiagnostic(
         nodeToRange(range),
         `${capitalize(readableName)} '${name}' does not match ${patternsName} naming convention (style: ${namingStyle})`,
-        SEVERITY_LEVEL_MAPPING[severityLevel]
+        SEVERITY_LEVEL_MAPPING[severityLevel],
+        AntiPatternIdentifier.NAMING_CONVENTION
       );
     },
   };

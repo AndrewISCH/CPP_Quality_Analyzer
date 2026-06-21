@@ -1,10 +1,10 @@
 import { Node } from 'web-tree-sitter';
-import * as vscode from 'vscode';
 import { RuleBuilder, BaseRuleConfig } from '../../rules-builder/types';
 import { nodeToRange } from '../../../utility/nodeToRange';
 import { AntiPatternIdentifier } from '../identifier';
 import { SEVERITY_LEVEL_MAPPING } from '../../../constants/constants';
-import { getRuleFromDefaultConfig } from '../../rules-builder/default_config';
+import { getRuleFromDefaultConfig } from '../../rules-builder/config';
+import { createDiagnostic } from '../common';
 
 export interface MagicNumbersConfigType {}
 
@@ -66,10 +66,11 @@ export const magicNumbersBuilder: RuleBuilder<
         return null;
       }
 
-      return new vscode.Diagnostic(
+      return createDiagnostic(
         nodeToRange(node),
         `Magic number detected: ${node.text}`,
-        SEVERITY_LEVEL_MAPPING[severityLevel]
+        SEVERITY_LEVEL_MAPPING[severityLevel],
+        AntiPatternIdentifier.MAGIC_NUMBERS
       );
     },
   };

@@ -42,7 +42,7 @@ interface AntiPatternExtendedConfiguration {
 }
 
 export interface AnalyzerConfig {
-  fixOnSave: boolean;
+  fixOnSave: { rules: 'all' | AntiPatternIdentifier[] };
   ignore?: string[];
   rules: {
     [K in AntiPatternIdentifier]: (K extends keyof AntiPatternExtendedConfiguration

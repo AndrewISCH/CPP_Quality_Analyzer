@@ -1,5 +1,5 @@
 import { AnalyzerConfig, BuiltRule, RuleBuilder } from './types';
-import { DEFAULT_CONFIG } from './default_config';
+import { DEFAULT_CONFIG, validateConfig } from './config';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { CONFIG_FILENAME } from '../../constants/constants';
@@ -20,6 +20,7 @@ import { redundantBooleanReturnBuilder } from '../anti-pattern/redundantBooleanR
 import { namingConventionBuilder } from '../anti-pattern/namingConvention';
 import { redundantBooleanTernaryBuilder } from '../anti-pattern/redundantBooleanTernary';
 import { duplicateConditionBuilder } from '../anti-pattern/duplicateCondition';
+import { SUPPORTED_ANTIPATTERNS } from '../code-actions/provider';
 
 const NODE_TYPE_TO_APPLIED_RULES: Record<string, AntiPatternIdentifier[]> = {
   ['declaration']: [
@@ -110,11 +111,27 @@ class RulesConfig {
     this.configFilePath = files[0]?.fsPath ?? null;
   }
 
+  public buildQuickFixRules() {
+    const rules = this.options.fixOnSave?.rules;
+
+    if (!rules || !this.options.fixOnSave) {
+      return;
+    }
+
+    const normalizedRules =
+      rules === 'all'
+        ? SUPPORTED_ANTIPATTERNS
+        : rules.filter((rule) => SUPPORTED_ANTIPATTERNS.includes(rule));
+
+    this.options.fixOnSave.rules = normalizedRules;
+  }
+
   public build(): void {
     const config = this.loadConfig();
     const { rules, ...options } = config;
     this.rules = {};
     this.options = options;
+    this.buildQuickFixRules();
 
     for (const [nodeType, ruleIds] of Object.entries(
       NODE_TYPE_TO_APPLIED_RULES
@@ -134,7 +151,8 @@ class RulesConfig {
     try {
       const raw = fs.readFileSync(this.configFilePath, 'utf-8');
       const userConfig = JSON.parse(raw);
-      return deepMerge(DEFAULT_CONFIG, userConfig);
+      const validatedConfig = validateConfig(userConfig);
+      return deepMerge(DEFAULT_CONFIG, validatedConfig) as AnalyzerConfig;
     } catch {
       return DEFAULT_CONFIG;
     }

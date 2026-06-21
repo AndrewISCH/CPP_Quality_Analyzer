@@ -1,10 +1,10 @@
 import { Node } from 'web-tree-sitter';
-import * as vscode from 'vscode';
 import { RuleBuilder, BaseRuleConfig } from '../../rules-builder/types';
 import { nodeToRange } from '../../../utility/nodeToRange';
 import { AntiPatternIdentifier } from '../identifier';
 import { SEVERITY_LEVEL_MAPPING } from '../../../constants/constants';
-import { getRuleFromDefaultConfig } from '../../rules-builder/default_config';
+import { getRuleFromDefaultConfig } from '../../rules-builder/config';
+import { createDiagnostic } from '../common';
 
 export interface RedundantBooleanReturnConfigType {}
 
@@ -104,10 +104,11 @@ export const redundantBooleanReturnBuilder: RuleBuilder<
           ? '<condition>'
           : '!(<condition>)';
 
-      return new vscode.Diagnostic(
+      return createDiagnostic(
         nodeToRange(node),
         `Redundant if-else returning boolean. Use 'return ${displayConditionString};' instead`,
-        SEVERITY_LEVEL_MAPPING[severityLevel]
+        SEVERITY_LEVEL_MAPPING[severityLevel],
+        AntiPatternIdentifier.REDUNDANT_BOOLEAN_RETURN
       );
     },
   };

@@ -1,10 +1,10 @@
 import { Node } from 'web-tree-sitter';
-import * as vscode from 'vscode';
 import { RuleBuilder, BaseRuleConfig } from '../../rules-builder/types';
 import { nodeToRange } from '../../../utility/nodeToRange';
 import { AntiPatternIdentifier } from '../identifier';
 import { SEVERITY_LEVEL_MAPPING } from '../../../constants/constants';
-import { getRuleFromDefaultConfig } from '../../rules-builder/default_config';
+import { getRuleFromDefaultConfig } from '../../rules-builder/config';
+import { createDiagnostic } from '../common';
 
 export interface RedundantBooleanTernaryConfigType {}
 
@@ -68,10 +68,11 @@ export const redundantBooleanTernaryBuilder: RuleBuilder<
           ? '<condition>'
           : '!(<condition>)';
 
-      return new vscode.Diagnostic(
+      return createDiagnostic(
         nodeToRange(node),
         `Redundant boolean ternary expression. Use '${displayConditionString}' instead`,
-        SEVERITY_LEVEL_MAPPING[severityLevel]
+        SEVERITY_LEVEL_MAPPING[severityLevel],
+        AntiPatternIdentifier.REDUNDANT_BOOLEAN_TERNARY
       );
     },
   };

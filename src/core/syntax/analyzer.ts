@@ -8,7 +8,7 @@ import {
 } from './syntax-parser';
 import * as vscode from 'vscode';
 
-const PARSED_TREE_CACHE: Map<string, Tree> = new Map();
+export const PARSED_TREE_CACHE: Map<string, Tree> = new Map();
 
 export const deleteTree = (uri: string) => PARSED_TREE_CACHE.delete(uri);
 

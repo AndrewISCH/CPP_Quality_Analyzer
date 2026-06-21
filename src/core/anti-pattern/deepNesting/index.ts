@@ -1,10 +1,10 @@
 import { Node } from 'web-tree-sitter';
-import * as vscode from 'vscode';
 import { RuleBuilder, BaseRuleConfig } from '../../rules-builder/types';
 import { nodeToRange } from '../../../utility/nodeToRange';
 import { SEVERITY_LEVEL_MAPPING } from '../../../constants/constants';
 import { AntiPatternIdentifier } from '../identifier';
-import { getRuleFromDefaultConfig } from '../../rules-builder/default_config';
+import { getRuleFromDefaultConfig } from '../../rules-builder/config';
+import { createDiagnostic } from '../common';
 
 export interface DeepNestingConfigType {
   maxDepth: number;
@@ -56,10 +56,11 @@ export const deepNestingBuilder: RuleBuilder<
       if (depth <= maxDepth) {
         return null;
       }
-      return new vscode.Diagnostic(
+      return createDiagnostic(
         nodeToRange(node),
         `Nesting too deep: ${depth} levels (max ${maxDepth})`,
-        SEVERITY_LEVEL_MAPPING[severityLevel]
+        SEVERITY_LEVEL_MAPPING[severityLevel],
+        AntiPatternIdentifier.DEEP_NESTING
       );
     },
   };

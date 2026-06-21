@@ -1,10 +1,10 @@
 import { Node } from 'web-tree-sitter';
-import * as vscode from 'vscode';
 import { RuleBuilder, BaseRuleConfig } from '../../rules-builder/types';
 import { nodeToRange } from '../../../utility/nodeToRange';
 import { SEVERITY_LEVEL_MAPPING } from '../../../constants/constants';
 import { AntiPatternIdentifier } from '../identifier';
-import { getRuleFromDefaultConfig } from '../../rules-builder/default_config';
+import { getRuleFromDefaultConfig } from '../../rules-builder/config';
+import { createDiagnostic } from '../common';
 
 export interface EmptyCatchBlockConfigType {
   allowComments: boolean;
@@ -38,10 +38,11 @@ export const emptyCatchBlockBuilder: RuleBuilder<
         return null;
       }
 
-      return new vscode.Diagnostic(
+      return createDiagnostic(
         nodeToRange(node),
         'Catch block should not be empty',
-        SEVERITY_LEVEL_MAPPING[severityLevel]
+        SEVERITY_LEVEL_MAPPING[severityLevel],
+        AntiPatternIdentifier.EMPTY_CATCH_BLOCK
       );
     },
   };

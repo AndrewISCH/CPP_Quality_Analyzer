@@ -16,6 +16,7 @@ import {
   clearDiagnosticForIgnoredDocs,
   shouldIgnore,
 } from './core/rules-builder/ignore';
+import { AnalyzerCodeActionProvider } from './core/code-actions/provider';
 
 const CONFIG_FILENAME_MATCHER = `**/${CONFIG_FILENAME}`;
 
@@ -145,6 +146,17 @@ export async function activate(context: vscode.ExtensionContext) {
     },
     null,
     context.subscriptions
+  );
+
+  context.subscriptions.push(
+    vscode.languages.registerCodeActionsProvider(
+      SUPPORTED_LANGUAGE_IDS.map((id) => ({ language: id })),
+      new AnalyzerCodeActionProvider(),
+      {
+        providedCodeActionKinds:
+          AnalyzerCodeActionProvider.providedCodeActionKinds,
+      }
+    )
   );
 
   const watcher = vscode.workspace.createFileSystemWatcher(

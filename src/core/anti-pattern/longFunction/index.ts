@@ -1,10 +1,10 @@
 import { AnalyzerConfig, RuleBuilder } from '../../rules-builder/types';
-import * as vscode from 'vscode';
 import { AntiPatternIdentifier } from '../identifier';
 import { SyntaxNode } from '../../syntax/syntax-parser';
 import { nodeToRange } from '../../../utility/nodeToRange';
 import { SEVERITY_LEVEL_MAPPING } from '../../../constants/constants';
-import { getRuleFromDefaultConfig } from '../../rules-builder/default_config';
+import { getRuleFromDefaultConfig } from '../../rules-builder/config';
+import { createDiagnostic } from '../common';
 
 export interface LongFunctionConfigType {
   maxLines: number;
@@ -29,10 +29,11 @@ export const longFunctionBuilder: RuleBuilder<
       if (lineCount <= maxLines) {
         return null;
       }
-      return new vscode.Diagnostic(
+      return createDiagnostic(
         nodeToRange(node),
         `Function too long. Current: ${lineCount} lines (max ${maxLines})`,
-        SEVERITY_LEVEL_MAPPING[severityLevel]
+        SEVERITY_LEVEL_MAPPING[severityLevel],
+        AntiPatternIdentifier.LONG_FUNCTION_PATTERN
       );
     },
   };
