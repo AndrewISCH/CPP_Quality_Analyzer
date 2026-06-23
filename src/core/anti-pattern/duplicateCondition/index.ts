@@ -74,7 +74,8 @@ export const duplicateConditionBuilder: RuleBuilder<
       }
 
       const seen = new Set<string>();
-      conditions.forEach((condition) => {
+
+      for (const condition of conditions) {
         if (seen.has(condition)) {
           return createDiagnostic(
             nodeToRange(node),
@@ -84,7 +85,7 @@ export const duplicateConditionBuilder: RuleBuilder<
           );
         }
         seen.add(condition);
-      });
+      }
 
       return null;
     },
