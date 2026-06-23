@@ -2,7 +2,7 @@
   "name": "cpp-quality-analyzer",
   "displayName": "CPP Quality Analyzer",
   "description": "Static code analyzer for detecting code smells and anti-patterns in C++ code",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "AndrewISCH",
   "license": "MIT",
   "icon": "images/icon.png",
